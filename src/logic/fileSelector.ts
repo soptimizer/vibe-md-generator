@@ -45,8 +45,8 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
     files.push('SECURITY_MD');
   }
 
-  // API projects
-  if (config.type === 'api' || config.backend !== 'none') {
+  // API / service projects
+  if (config.type === 'api' || config.type === 'service' || config.backend !== 'none') {
     files.push('API_SPEC_MD');
   }
 

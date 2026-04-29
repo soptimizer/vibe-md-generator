@@ -1,6 +1,6 @@
 // src/types/index.ts
 
-export type ProjectType = 'webapp' | 'api' | 'game' | 'cli' | 'library' | 'mobile';
+export type ProjectType = 'webapp' | 'api' | 'service' | 'game' | 'cli' | 'library' | 'mobile';
 export type ProjectScale = 'solo' | 'small-team' | 'enterprise';
 export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'generic';
 export type Frontend = 'react' | 'vue' | 'nextjs' | 'svelte' | 'vanilla' | 'none';

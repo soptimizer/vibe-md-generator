@@ -7,7 +7,7 @@ import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 
-const projectTypes: Array<ProjectConfig['type']> = ['webapp', 'api', 'game', 'cli', 'library', 'mobile'];
+const projectTypes: Array<ProjectConfig['type']> = ['webapp', 'api', 'service', 'game', 'cli', 'library', 'mobile'];
 const projectScales: Array<ProjectConfig['scale']> = ['solo', 'small-team', 'enterprise'];
 const aiTools: Array<ProjectConfig['aiTool']> = ['claude', 'cursor', 'windsurf', 'codex', 'generic'];
 
