@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:www.vooster.ai)",
+      "WebFetch(domain:oldane-graham.medium.com)",
+      "WebSearch",
+      "WebFetch(domain:www.humanlayer.dev)",
+      "WebFetch(domain:addyosmani.com)",
+      "WebFetch(domain:trigger.dev)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(node -e ' *)",
+      "Bash(npx tsx -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git branch *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
