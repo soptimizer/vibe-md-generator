@@ -139,18 +139,18 @@ export default function Step2_Stack() {
       updateConfig({ frontend: 'none' });
     }
     if (frontendForced && stackIntent === 'frontend') {
-      setStackIntent('backend');
+      setStackIntent(backendForced ? 'none' : 'backend');
     }
-  }, [config.type, frontendForced, stackIntent]);
+  }, [config.type, frontendForced, backendForced, stackIntent]);
 
   useEffect(() => {
     if (backendForced && config.backend !== 'none') {
       updateConfig({ backend: 'none', databases: [], queues: [] });
     }
     if (backendForced && stackIntent === 'backend') {
-      setStackIntent('frontend');
+      setStackIntent(frontendForced ? 'none' : 'frontend');
     }
-  }, [config.type, backendForced, stackIntent]);
+  }, [config.type, backendForced, frontendForced, stackIntent]);
 
   useEffect(() => {
     if (!hasBackend && (config.databases.length > 0 || config.queues.length > 0)) {
