@@ -1,301 +1,176 @@
 import { useEffect, useState } from 'react';
 import { useProjectStore } from '../../store/projectStore';
 import type { ProjectConfig } from '../../types';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { MultiSelect } from '../ui/multi-select';
+import { Monitor, Server } from 'lucide-react';
 
 const allFrontends: Array<ProjectConfig['frontend']> = ['react', 'vue', 'nextjs', 'svelte', 'vanilla', 'none'];
 const allBackends: Array<ProjectConfig['backend']> = ['nodejs', 'python', 'go', 'rust', 'dotnet', 'none'];
 const allDatabases: Array<ProjectConfig['databases'][number]> = ['postgresql', 'mongodb', 'sqlite', 'mysql', 'redis', 'elastic', 'bigquery', 'clickhouse'];
 const allQueues: Array<ProjectConfig['queues'][number]> = ['kafka', 'rabbitmq'];
 const packageManagers: Array<ProjectConfig['packageManager']> = ['npm', 'pnpm', 'bun', 'yarn'];
-
 const NO_FRONTEND_TYPES: Array<ProjectConfig['type']> = ['api', 'cli', 'library'];
 const NO_BACKEND_TYPES: Array<ProjectConfig['type']> = ['library'];
-
 type StackIntent = 'frontend' | 'backend' | 'none';
 
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-  disabled,
-  hint,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: string[];
-  disabled?: boolean;
-  hint?: string;
+const ChevronRight = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+);
+const ChevronLeft = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+);
+const MiniCheck = () => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="2 6 5 9 10 3" /></svg>
+);
+
+function SelectField({ label, id, value, onChange, options, disabled }: {
+  label: string; id: string; value: string;
+  onChange: (v: string) => void; options: string[]; disabled?: boolean;
 }) {
   return (
-    <div className="grid gap-2 sm:grid-cols-[140px_minmax(0,1fr)] sm:items-center">
-      <Label className={`text-sm font-medium ${disabled ? 'text-muted-foreground' : ''}`}>{label}</Label>
-      <div className="space-y-2">
-        <Select value={value} onValueChange={onChange} disabled={disabled}>
-          <SelectTrigger className={disabled ? 'bg-muted/50 text-muted-foreground' : ''}>
-            <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((opt) => (
-              <SelectItem key={opt} value={opt}>
-                {opt}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
-      </div>
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id} className={`text-xs font-semibold uppercase tracking-wide ${disabled ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>{label}</Label>
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger id={id} className={`text-sm border-border/60 transition-colors ${disabled ? 'opacity-50 bg-muted/20' : 'bg-muted/30 focus:border-primary/60'}`}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
 
-function MultiSelectField({
-  label,
-  values,
-  onChange,
-  options,
-  disabled,
-  hint,
-  placeholder,
-}: {
-  label: string;
-  values: string[];
-  onChange: (values: string[]) => void;
-  options: string[];
-  disabled?: boolean;
-  hint?: string;
-  placeholder?: string;
+function MultiField({ label, values, onChange, options, placeholder }: {
+  label: string; values: string[]; onChange: (v: string[]) => void; options: string[]; placeholder?: string;
 }) {
-  const selectOptions = options.map((o) => ({ label: o, value: o }));
-
   return (
-    <div className="grid gap-2 sm:grid-cols-[140px_minmax(0,1fr)] sm:items-center">
-      <Label className={`text-sm font-medium ${disabled ? 'text-muted-foreground' : ''}`}>{label}</Label>
-      <div className="space-y-2">
-        <MultiSelect
-          options={selectOptions}
-          onValueChange={onChange}
-          defaultValue={values}
-          placeholder={placeholder || `Select ${label.toLowerCase()}...`}
-          disabled={disabled}
-          maxCount={4}
-          hideSelectAll
-          className={disabled ? 'bg-muted/50 text-muted-foreground' : ''}
-        />
-        {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
-      </div>
+    <div className="flex flex-col gap-1.5">
+      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</Label>
+      <MultiSelect
+        options={options.map((o) => ({ label: o, value: o }))}
+        onValueChange={onChange}
+        defaultValue={values}
+        placeholder={placeholder || `Select ${label.toLowerCase()}...`}
+        maxCount={4}
+        hideSelectAll
+      />
     </div>
   );
 }
 
 export default function Step2_Stack() {
   const { config, updateConfig, step, setStep } = useProjectStore();
-
   const frontendForced = NO_FRONTEND_TYPES.includes(config.type);
-  const backendForced = NO_BACKEND_TYPES.includes(config.type);
-  const hasBackend = config.backend !== 'none';
-  const hasFrontend = config.frontend !== 'none';
-  const frontendAllowed = !frontendForced;
-  const backendAllowed = !backendForced;
+  const backendForced  = NO_BACKEND_TYPES.includes(config.type);
+  const hasBackend     = config.backend !== 'none';
   const [stackIntent, setStackIntent] = useState<StackIntent>(() => {
-    if (hasFrontend) return 'frontend';
-    if (hasBackend) return 'backend';
-    if (frontendAllowed) return 'frontend';
-    if (backendAllowed) return 'backend';
+    if (config.frontend !== 'none') return 'frontend';
+    if (config.backend  !== 'none') return 'backend';
+    if (!frontendForced) return 'frontend';
+    if (!backendForced)  return 'backend';
     return 'none';
   });
-  const needsPackageManager = stackIntent === 'frontend' || config.backend === 'nodejs';
+  const needsPkg = stackIntent === 'frontend' || config.backend === 'nodejs';
 
-  const chooseStackIntent = (intent: StackIntent) => {
+  const choose = (intent: StackIntent) => {
     setStackIntent(intent);
-
-    if (intent === 'frontend') {
-      updateConfig({
-        frontend: config.frontend !== 'none' ? config.frontend : 'react',
-        backend: 'none',
-        databases: [],
-        queues: [],
-      });
-      return;
-    }
-
-    if (intent === 'backend') {
-      updateConfig({
-        backend: config.backend !== 'none' ? config.backend : 'nodejs',
-        frontend: 'none',
-      });
-      return;
-    }
+    if (intent === 'frontend') updateConfig({ frontend: config.frontend !== 'none' ? config.frontend : 'react', backend: 'none', databases: [], queues: [] });
+    else if (intent === 'backend') updateConfig({ backend: config.backend !== 'none' ? config.backend : 'nodejs', frontend: 'none' });
   };
 
   useEffect(() => {
-    if (frontendForced && config.frontend !== 'none') {
-      updateConfig({ frontend: 'none' });
-    }
-    if (frontendForced && stackIntent === 'frontend') {
-      setStackIntent(backendForced ? 'none' : 'backend');
-    }
-  }, [config.type, frontendForced, backendForced, stackIntent]);
+    if (frontendForced && config.frontend !== 'none') updateConfig({ frontend: 'none' });
+    if (frontendForced && stackIntent === 'frontend') setStackIntent(backendForced ? 'none' : 'backend');
+  }, [config.type]);
 
   useEffect(() => {
-    if (backendForced && config.backend !== 'none') {
-      updateConfig({ backend: 'none', databases: [], queues: [] });
-    }
-    if (backendForced && stackIntent === 'backend') {
-      setStackIntent(frontendForced ? 'none' : 'frontend');
-    }
-  }, [config.type, backendForced, frontendForced, stackIntent]);
+    if (backendForced && config.backend !== 'none') updateConfig({ backend: 'none', databases: [], queues: [] });
+    if (backendForced && stackIntent === 'backend') setStackIntent(frontendForced ? 'none' : 'frontend');
+  }, [config.type]);
 
   useEffect(() => {
-    if (!hasBackend && (config.databases.length > 0 || config.queues.length > 0)) {
-      updateConfig({ databases: [], queues: [] });
-    }
+    if (!hasBackend && (config.databases.length > 0 || config.queues.length > 0)) updateConfig({ databases: [], queues: [] });
   }, [config.backend]);
 
   useEffect(() => {
-    if (config.frontend !== 'none' && stackIntent !== 'frontend') {
-      setStackIntent('frontend');
-    }
-    if (config.backend !== 'none' && stackIntent !== 'backend') {
-      setStackIntent('backend');
-    }
+    if (config.frontend !== 'none' && stackIntent !== 'frontend') setStackIntent('frontend');
+    if (config.backend  !== 'none' && stackIntent !== 'backend')  setStackIntent('backend');
   }, [config.frontend, config.backend]);
 
   const handleChange = (key: keyof ProjectConfig) => (value: any) => {
-    const updates: Partial<ProjectConfig> = { [key]: value } as Partial<ProjectConfig>;
-    if (key === 'backend' && value === 'none') {
-      updates.databases = [];
-      updates.queues = [];
-    }
-    updateConfig(updates);
+    const upd: Partial<ProjectConfig> = { [key]: value } as Partial<ProjectConfig>;
+    if (key === 'backend' && value === 'none') { upd.databases = []; upd.queues = []; }
+    updateConfig(upd);
   };
 
   return (
-    <Card className="shadow-xl shadow-black/20">
-      <CardHeader className="pb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Wizard</p>
-        <CardTitle className="text-2xl font-semibold">Step 2 — Tech stack</CardTitle>
-        <CardDescription className="max-w-2xl text-sm">
-          Select the frontend, backend and database options that match your project type.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => chooseStackIntent('frontend')}
-            disabled={!frontendAllowed}
-            className={`rounded-xl border p-4 text-left transition-colors ${
-              stackIntent === 'frontend'
-                ? 'border-primary bg-primary/10 text-foreground'
-                : 'border-border bg-card text-muted-foreground hover:border-muted-foreground'
-            } ${!frontendAllowed ? 'cursor-not-allowed opacity-50' : ''}`}
-          >
-            <p className="font-semibold text-foreground">Frontend app</p>
-            <p className="mt-1 text-sm opacity-80">
-              Only choose a frontend framework and package manager.
-            </p>
-          </button>
-          <button
-            type="button"
-            onClick={() => chooseStackIntent('backend')}
-            disabled={!backendAllowed}
-            className={`rounded-xl border p-4 text-left transition-colors ${
-              stackIntent === 'backend'
-                ? 'border-primary bg-primary/10 text-foreground'
-                : 'border-border bg-card text-muted-foreground hover:border-muted-foreground'
-            } ${!backendAllowed ? 'cursor-not-allowed opacity-50' : ''}`}
-          >
-            <p className="font-semibold text-foreground">Backend app</p>
-            <p className="mt-1 text-sm opacity-80">
-              Choose backend, database and package manager when needed.
-            </p>
-          </button>
+    <div className="flex flex-col gap-5 rounded-2xl border border-border/60 bg-card p-5 shadow-xl shadow-black/30">
+      <div className="flex items-center gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 border border-primary/25 text-sm font-bold text-primary">2</span>
+        <div>
+          <h2 className="text-base font-bold text-foreground">Tech stack</h2>
+          <p className="text-xs text-muted-foreground">Frontend, backend, and database choices</p>
         </div>
+      </div>
 
-        {stackIntent === 'frontend' && (
-          <div className="grid gap-4">
-            <SelectField
-              label="Frontend"
-              value={config.frontend}
-              onChange={handleChange('frontend')}
-              options={allFrontends}
-            />
-            {needsPackageManager && (
-              <SelectField
-                label="Package manager"
-                value={config.packageManager}
-                onChange={handleChange('packageManager')}
-                options={packageManagers}
-              />
+      <div className="h-px bg-border/50" />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {([['frontend', Monitor, 'Frontend app', 'Framework + package manager', !frontendForced], ['backend', Server, 'Backend app', 'Server + DB + queues', !backendForced]] as const).map(([intent, Icon, title, desc, allowed]) => (
+          <button
+            key={intent}
+            type="button"
+            onClick={() => allowed && choose(intent as StackIntent)}
+            disabled={!allowed}
+            className={`option-card flex items-start gap-3 rounded-xl border p-4 text-left cursor-pointer ${stackIntent === intent ? 'selected' : 'border-border/60 bg-muted/20'} ${!allowed ? 'cursor-not-allowed opacity-40' : ''}`}
+          >
+            <Icon className={`h-5 w-5 mt-0.5 shrink-0 transition-colors ${stackIntent === intent ? 'text-primary' : 'text-muted-foreground'}`} />
+            <div className="flex-1">
+              <p className="font-semibold text-sm text-foreground">{title}</p>
+              <p className="mt-1 text-xs text-muted-foreground leading-snug">{desc}</p>
+            </div>
+            {stackIntent === intent && (
+              <span className="ml-auto shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground"><MiniCheck /></span>
             )}
-          </div>
-        )}
+          </button>
+        ))}
+      </div>
 
-        {stackIntent === 'backend' && (
-          <div className="grid gap-4">
-            <SelectField
-              label="Backend"
-              value={config.backend}
-              onChange={handleChange('backend')}
-              options={allBackends}
-            />
-            {hasBackend && (
-              <>
-                <MultiSelectField
-                  label="Databases"
-                  values={config.databases}
-                  onChange={handleChange('databases')}
-                  options={allDatabases}
-                  placeholder="Select databases..."
-                />
-                <MultiSelectField
-                  label="Queues / Brokers"
-                  values={config.queues}
-                  onChange={handleChange('queues')}
-                  options={allQueues}
-                  placeholder="Select queues..."
-                />
-              </>
-            )}
-            {needsPackageManager && (
-              <SelectField
-                label="Package manager"
-                value={config.packageManager}
-                onChange={handleChange('packageManager')}
-                options={packageManagers}
-              />
-            )}
-          </div>
-        )}
+      {stackIntent === 'frontend' && (
+        <div className="grid gap-4 animate-fade-in-up">
+          <SelectField label="Framework" id="frontend" value={config.frontend} onChange={handleChange('frontend')} options={allFrontends} />
+          {needsPkg && <SelectField label="Package manager" id="pkg" value={config.packageManager} onChange={handleChange('packageManager')} options={packageManagers} />}
+        </div>
+      )}
 
-        {stackIntent === 'none' && (
-          <div className="rounded-xl border bg-muted/50 p-4 text-sm text-muted-foreground">
-            This project type does not require a frontend or backend stack selection.
-            Continue to the next step to configure features and documentation.
-          </div>
-        )}
+      {stackIntent === 'backend' && (
+        <div className="grid gap-4 animate-fade-in-up">
+          <SelectField label="Runtime" id="backend" value={config.backend} onChange={handleChange('backend')} options={allBackends} />
+          {hasBackend && (
+            <div className="grid gap-4">
+              <MultiField label="Databases" values={config.databases} onChange={handleChange('databases')} options={allDatabases} placeholder="None selected" />
+              <MultiField label="Queues / Brokers" values={config.queues} onChange={handleChange('queues')} options={allQueues} placeholder="None selected" />
+            </div>
+          )}
+          {needsPkg && <SelectField label="Package manager" id="pkg-be" value={config.packageManager} onChange={handleChange('packageManager')} options={packageManagers} />}
+        </div>
+      )}
 
-        {!hasBackend && stackIntent === 'backend' && (
-          <p className="text-sm text-muted-foreground text-center pt-2">
-            Database and package manager appear as soon as you choose a backend.
-          </p>
-        )}
-      </CardContent>
-      <CardFooter className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-border/50">
-        <Button variant="outline" onClick={() => setStep(step - 1)}>
-          Back
-        </Button>
-        <Button onClick={() => setStep(step + 1)}>
-          Continue
-        </Button>
-      </CardFooter>
-    </Card>
+      {stackIntent === 'none' && (
+        <div className="rounded-xl border border-border/40 bg-muted/20 p-4 text-sm text-muted-foreground animate-fade-in-up">
+          This project type doesn't require stack selection. Continue to configure features.
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-1">
+        <Button variant="outline" onClick={() => setStep(step - 1)} className="gap-1.5"><ChevronLeft />Back</Button>
+        <Button onClick={() => setStep(step + 1)} className="gap-1.5">Continue<ChevronRight /></Button>
+      </div>
+    </div>
   );
 }

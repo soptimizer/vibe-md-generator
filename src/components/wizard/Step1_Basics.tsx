@@ -1,75 +1,73 @@
 import { useProjectStore } from '../../store/projectStore';
 import type { ProjectConfig } from '../../types';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
+import { AlertCircle } from 'lucide-react';
 
 const projectTypes: Array<ProjectConfig['type']> = ['webapp', 'api', 'service', 'game', 'cli', 'library', 'mobile'];
 const projectScales: Array<ProjectConfig['scale']> = ['solo', 'small-team', 'enterprise'];
 const aiTools: Array<ProjectConfig['aiTool']> = ['claude', 'cursor', 'windsurf', 'codex', 'generic'];
 
+const projectTypeIcons: Record<string, string> = {
+  webapp: '🌐', api: '⚡', service: '⚙️', game: '🎮', cli: '💻', library: '📦', mobile: '📱',
+};
+const aiToolIcons: Record<string, string> = {
+  claude: 'C', cursor: 'Cs', windsurf: 'W', codex: 'Cx', generic: 'G',
+};
+
 function Field({
-  label,
-  value,
-  onChange,
-  hint,
-  type = 'text',
+  label, id, value, onChange, hint, type = 'text',
 }: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  hint?: string;
-  type?: 'text' | 'textarea';
+  label: string; id: string; value: string;
+  onChange: (value: string) => void; hint?: string; type?: 'text' | 'textarea';
 }) {
   return (
-    <div className="grid gap-2 sm:grid-cols-[140px_minmax(0,1fr)] sm:items-start">
-      <Label className="text-sm font-medium mt-2.5">{label}</Label>
-      <div>
-        {type === 'textarea' ? (
-          <Textarea
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={hint}
-            className="min-h-[60px] resize-y"
-          />
-        ) : (
-          <Input
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={hint}
-          />
-        )}
-      </div>
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
+      {type === 'textarea' ? (
+        <Textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={hint}
+          className="min-h-[72px] resize-none text-sm bg-muted/30 border-border/60 focus:border-primary/60 transition-colors"
+        />
+      ) : (
+        <Input
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={hint}
+          className="text-sm bg-muted/30 border-border/60 focus:border-primary/60 transition-colors"
+        />
+      )}
     </div>
   );
 }
 
 function SelectField({
-  label,
-  value,
-  onChange,
-  options,
+  label, id, value, onChange, options,
 }: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: string[];
+  label: string; id: string; value: string;
+  onChange: (value: string) => void; options: string[];
 }) {
   return (
-    <div className="grid gap-2 sm:grid-cols-[140px_minmax(0,1fr)] sm:items-center">
-      <Label className="text-sm font-medium">{label}</Label>
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
+        <SelectTrigger id={id} className="text-sm bg-muted/30 border-border/60 focus:border-primary/60 transition-colors">
           <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {option}
-            </SelectItem>
+            <SelectItem key={option} value={option}>{option}</SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -87,37 +85,49 @@ export default function Step1_Basics() {
   const canContinue = config.name.trim().length > 0 && config.description.trim().length > 0;
 
   return (
-    <Card className="shadow-xl shadow-black/20">
-      <CardHeader className="pb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Wizard</p>
-        <CardTitle className="text-2xl font-semibold">Step 1 — Project basics</CardTitle>
-        <CardDescription className="max-w-2xl text-sm">
-          Enter your project name, description, and the core metadata that drives file generation.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4">
+    <div className="flex flex-col gap-5 rounded-2xl border border-border/60 bg-card p-5 shadow-xl shadow-black/30">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 border border-primary/25 text-sm font-bold text-primary">
+          1
+        </span>
+        <div>
+          <h2 className="text-base font-bold text-foreground">Project basics</h2>
+          <p className="text-xs text-muted-foreground">Name, description, and core metadata</p>
+        </div>
+      </div>
+
+      <div className="h-px bg-border/50" />
+
+      {/* Fields */}
+      <div className="flex flex-col gap-4">
         <Field
           label="Project name"
+          id="project-name"
           value={config.name}
           onChange={handleChange('name')}
           hint="e.g. my-saas-app"
         />
         <Field
           label="Project description"
+          id="project-description"
           value={config.description}
           onChange={handleChange('description')}
           hint="A short summary of what this project does"
           type="textarea"
         />
-        <div className="grid gap-4 mt-2">
-          <SelectField label="Project type" value={config.type} onChange={handleChange('type')} options={projectTypes} />
-          <SelectField label="Team size" value={config.scale} onChange={handleChange('scale')} options={projectScales} />
-          <SelectField label="AI tool" value={config.aiTool} onChange={handleChange('aiTool')} options={aiTools} />
+        <div className="grid gap-3 sm:grid-cols-3">
+          <SelectField label="Type"     id="project-type"  value={config.type}    onChange={handleChange('type')}    options={projectTypes} />
+          <SelectField label="Scale"    id="team-scale"    value={config.scale}   onChange={handleChange('scale')}   options={projectScales} />
+          <SelectField label="AI tool"  id="ai-tool"       value={config.aiTool}  onChange={handleChange('aiTool')}  options={aiTools} />
         </div>
-      </CardContent>
-      <CardFooter className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-border/50">
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between gap-3 pt-1">
         {!canContinue ? (
-          <p className="text-sm text-destructive">
+          <p className="flex items-center gap-1.5 text-xs text-destructive">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
             {!config.name.trim() && !config.description.trim()
               ? 'Name and description are required'
               : !config.name.trim()
@@ -125,17 +135,21 @@ export default function Step1_Basics() {
               : 'Project description is required'}
           </p>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            Your selections are reflected live in the preview panel.
+          <p className="text-xs text-muted-foreground">
+            Selections are reflected live in the preview.
           </p>
         )}
         <Button
           onClick={() => setStep(step + 1)}
           disabled={!canContinue}
+          className="shrink-0 gap-2"
         >
           Continue
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

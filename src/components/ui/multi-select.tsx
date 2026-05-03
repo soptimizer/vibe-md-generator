@@ -288,7 +288,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent className={cn("w-auto p-0 min-w-[300px]", popoverClassName)} align="start" onEscapeKeyDown={() => setIsPopoverOpen(false)}>
+          <PopoverContent className={cn("p-0 w-[var(--radix-popover-trigger-width)] min-w-[180px]", popoverClassName)} align="start" onEscapeKeyDown={() => setIsPopoverOpen(false)}>
             <Command>
               {searchable && (
                 <CommandInput

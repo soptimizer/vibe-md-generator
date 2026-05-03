@@ -2,7 +2,7 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { copyToClipboard } from '../../logic/exporter';
-import { Button } from '../ui/button';
+import { FileText, Copy, Check, Code, Eye } from 'lucide-react';
 
 interface Props {
   filename: string;
@@ -10,48 +10,64 @@ interface Props {
 }
 
 export default function MDPreview({ filename, content }: Props) {
-  const [raw, setRaw] = useState(false);
+  const [raw, setRaw]       = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     const ok = await copyToClipboard(content);
-    if (ok) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (ok) { setCopied(true); setTimeout(() => setCopied(false), 2000); }
   };
 
   return (
     <div className="flex flex-col overflow-hidden h-full">
-      <div className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2 bg-muted/10">
+      {/* Toolbar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-border/60 px-3 py-2 bg-card/60">
         <div className="flex items-center gap-2 min-w-0">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-primary" aria-hidden="true">
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <polyline points="14 2 14 8 20 8" />
-          </svg>
+          <FileText className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
           <span className="font-mono text-xs text-muted-foreground truncate">{filename}</span>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setRaw((r) => !r)}
-            className="h-6 text-xs px-2.5"
-          >
-            {raw ? 'Preview' : 'Raw'}
-          </Button>
-          <Button
-            variant={copied ? 'secondary' : 'ghost'}
-            size="sm"
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Raw / Preview toggle */}
+          <div className="flex items-center rounded-md border border-border/60 bg-muted/30 p-0.5">
+            <button
+              type="button"
+              onClick={() => setRaw(false)}
+              title="Rendered preview"
+              className={`flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium transition-colors cursor-pointer ${!raw ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <Eye className="h-3 w-3" />
+              <span className="hidden sm:inline">Preview</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRaw(true)}
+              title="Raw markdown"
+              className={`flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium transition-colors cursor-pointer ${raw ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <Code className="h-3 w-3" />
+              <span className="hidden sm:inline">Raw</span>
+            </button>
+          </div>
+
+          {/* Copy button */}
+          <button
+            type="button"
             onClick={handleCopy}
-            className="h-6 text-xs px-2.5 min-w-[52px]"
+            title="Copy to clipboard"
+            className={`flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer ${
+              copied
+                ? 'border-primary/40 bg-primary/10 text-primary'
+                : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:border-border'
+            }`}
           >
-            {copied ? '✓ Copied' : 'Copy'}
-          </Button>
+            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+            <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-4">
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-4 custom-scrollbar">
         {raw ? (
           <pre className="text-xs leading-relaxed text-foreground/80 whitespace-pre-wrap font-mono">{content}</pre>
         ) : (
