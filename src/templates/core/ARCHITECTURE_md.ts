@@ -1,6 +1,7 @@
 // src/templates/core/ARCHITECTURE_md.ts
 import type { ProjectConfig } from '../../types';
 import { getDepsLabel } from '../../logic/commands';
+import { hasSkill, hasAnySkill } from '../../logic/skillsHelper';
 
 function buildProjectTree(config: ProjectConfig): string {
   const root = `${config.name.toLowerCase().replace(/\s+/g, '-')}/`;
@@ -91,6 +92,66 @@ function buildProjectTree(config: ProjectConfig): string {
   return lines.join('\n');
 }
 
+function getSkillSections(config: ProjectConfig): string {
+  const sections: string[] = [];
+
+  if (hasAnySkill(config, ['docker', 'kubernetes'])) {
+    const orchLine = hasSkill(config, 'kubernetes')
+      ? '- Orchestration: Kubernetes (see k8s/ manifests)'
+      : '- Deployment: Docker Compose (see docker-compose.yml)';
+    sections.push(`## Container Architecture
+- All services run as isolated containers — no host-level dependencies
+- Multi-stage builds: builder stage compiles, final stage copies artifacts only
+- Images tagged by git SHA in CI; \`latest\` only for local development
+${orchLine}
+- Secrets injected via environment variables — never baked into images`);
+  }
+
+  if (hasSkill(config, 'caching-system')) {
+    sections.push(`## Caching Strategy
+- **L1 (in-memory):** Request-scoped cache for expensive computations within a single request
+- **L2 (Redis):** Cross-request shared cache; TTL set per resource type
+- Cache keys: \`{service}:{resource}:{id}:{version}\`
+- Invalidation: explicit on write, never on timer alone
+- Never cache: auth tokens, payment state, user-specific PII`);
+  }
+
+  if (hasSkill(config, 'microservices-arch')) {
+    sections.push(`## Service Boundaries
+- Each service owns its own database schema — no cross-service DB joins
+- Inter-service communication: REST for sync calls, message queue for async events
+- Service contracts versioned via API version prefix (\`/v1/\`, \`/v2/\`)
+- Health endpoints: \`GET /health\` (liveness) and \`GET /ready\` (readiness)
+- Distributed tracing: propagate \`X-Request-ID\` header across all service calls`);
+  }
+
+  if (hasAnySkill(config, ['rag-systems', 'machine-learning', 'nlp-processing'])) {
+    const isRAG = hasSkill(config, 'rag-systems');
+    sections.push(`## ${isRAG ? 'RAG Pipeline' : 'ML Pipeline'} Architecture
+${isRAG ? `- **Ingestion**: Document chunking → embedding generation → vector store upsert
+- **Retrieval**: Query embedding → vector similarity search → top-k context selection
+- **Generation**: Context + query → LLM → response with source citations
+- Embeddings cached per content hash; regenerated only when source changes
+- Prompt templates versioned in \`prompts/\` — treat them as code` : `- **Training**: Feature pipeline → model training → evaluation → artifact storage
+- **Serving**: Model loaded once at startup; predictions served synchronously
+- **Evaluation**: Offline metrics (F1, AUC) + online A/B testing framework
+- Model artifacts stored in object storage; version pinned in config`}
+- All AI outputs validated before storage or display — include confidence threshold`);
+  }
+
+  if (hasSkill(config, 'queue-system')) {
+    sections.push(`## Message Queue Architecture
+- **Producer**: Fire-and-forget with at-least-once delivery guarantee
+- **Consumer**: Idempotent handlers — duplicate messages must not cause side effects
+- Dead-letter queue (DLQ): messages failing after 3 retries go to DLQ for manual inspection
+- Message schema: JSON with \`{ id, type, payload, timestamp, version }\`
+- Queue names: \`{service}.{event}\` (e.g., \`orders.created\`, \`payments.failed\`)`);
+  }
+
+  if (sections.length === 0) return '';
+  return '\n' + sections.join('\n\n');
+}
+
 export default function ARCHITECTURE_md(config: ProjectConfig): string {
   const hasDB = config.databases.length > 0;
   const hasQueue = config.queues.length > 0;
@@ -167,6 +228,7 @@ ${buildProjectTree(config)}
 - Edit existing files before creating new ones
 ${config.hasAuth ? '- Auth logic isolated in /auth — never inline in routes\n' : ''}\
 ${config.hasPayments ? '- Payment logic isolated in /payments — never inline in components\n' : ''}\
+${getSkillSections(config)}
 
 _Update this file after any significant architectural change._
 `;

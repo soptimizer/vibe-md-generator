@@ -1,10 +1,51 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useProjectStore } from '../../store/projectStore';
 import { Button } from '../ui/button';
 import {
   Server, Palette, Container, Brain, Globe, PenLine,
-  BarChart3, BookOpen, Wrench, ChevronRight, Check, Star, Search, X
+  BarChart3, BookOpen, Wrench, ChevronRight, Check, Star, Search, X, Sparkles
 } from 'lucide-react';
+import type { ProjectConfig } from '../../types';
+
+function getSuggestedSkillIds(config: ProjectConfig): string[] {
+  const suggestions: string[] = [];
+
+  if (config.frontend === 'react' || config.frontend === 'nextjs') {
+    suggestions.push('ui-builder', 'component-system', 'state-management');
+  }
+  if (config.frontend === 'vue' || config.frontend === 'svelte') {
+    suggestions.push('ui-builder', 'component-system');
+  }
+  if (config.frontend !== 'none') {
+    suggestions.push('responsive-design', 'seo-optimization');
+  }
+  if (config.backend !== 'none') {
+    suggestions.push('api-builder', 'logging-monitoring');
+  }
+  if (config.databases.includes('postgresql') || config.databases.includes('mysql') || config.databases.includes('sqlite')) {
+    suggestions.push('database-designer', 'sql-optimizer');
+  }
+  if (config.databases.includes('mongodb')) {
+    suggestions.push('database-designer');
+  }
+  if (config.hasAuth) {
+    suggestions.push('auth-system');
+  }
+  if (config.hasTesting) {
+    suggestions.push('testing');
+  }
+  if (config.hasDeployment) {
+    suggestions.push('docker', 'cicd-pipeline');
+  }
+  if (config.queues.length > 0) {
+    suggestions.push('queue-system');
+  }
+  if (config.scale !== 'solo') {
+    suggestions.push('code-review', 'documentation');
+  }
+
+  return [...new Set(suggestions)];
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Skill {
@@ -186,6 +227,14 @@ export default function Step4_Skills() {
   const selectAll = () => updateConfig({ selectedSkills: ALL_SKILLS.map((s) => s.id) });
   const clearAll  = () => updateConfig({ selectedSkills: [] });
 
+  const suggestedIds = useMemo(() => getSuggestedSkillIds(config), [config]);
+  const unselectedSuggestions = suggestedIds.filter((id) => !selected.has(id));
+
+  const applySuggestions = () => {
+    const next = new Set([...Array.from(selected), ...suggestedIds]);
+    updateConfig({ selectedSkills: Array.from(next) });
+  };
+
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-xl shadow-black/30">
 
@@ -246,6 +295,41 @@ export default function Step4_Skills() {
           Clear
         </button>
       </div>
+
+      {/* ── Suggestions ── */}
+      {unselectedSuggestions.length > 0 && !q && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="h-3 w-3 text-primary/70 shrink-0" />
+              <span className="text-[11px] font-semibold text-primary/80">Suggested for your stack</span>
+            </div>
+            <button
+              type="button"
+              onClick={applySuggestions}
+              className="shrink-0 text-[10px] font-semibold text-primary hover:underline cursor-pointer"
+            >
+              Apply all
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {unselectedSuggestions.slice(0, 8).map((id) => {
+              const skill = ALL_SKILLS.find((s) => s.id === id);
+              if (!skill) return null;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => toggle(id)}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+                >
+                  + {skill.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Category accordion ── */}
       <div

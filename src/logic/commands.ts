@@ -33,7 +33,7 @@ export function getDevCmd(config: ProjectConfig): string {
 export function getBuildCmd(config: ProjectConfig): string {
   if (!isJSProject(config)) {
     if (config.backend === 'go') return 'go build ./...';
-    if (config.backend === 'python') return null as unknown as string;
+    if (config.backend === 'python') return 'python -m build';
     if (config.backend === 'rust') return 'cargo build --release';
     if (config.backend === 'dotnet') return 'dotnet build -c Release';
   }

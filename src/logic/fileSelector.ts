@@ -11,10 +11,12 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
   files.push('ARCHITECTURE_MD');
   files.push('PROGRESS_MD');
   files.push('GITIGNORE');
+  files.push('LLMS_TXT');
 
   // AI tool-specific ignore & rules files
   if (config.aiTool === 'claude') {
     files.push('CLAUDE_SETTINGS_JSON');
+    files.push('MCP_CONFIG_JSON');
   }
   if (config.aiTool === 'cursor') {
     files.push('CURSOR_RULES_MD');
@@ -22,6 +24,10 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
   }
   if (config.aiTool === 'windsurf') {
     files.push('WINDSURFIGNORE');
+    files.push('WINDSURF_RULES_MD');
+  }
+  if (config.aiTool === 'copilot') {
+    files.push('COPILOT_INSTRUCTIONS_MD');
   }
 
   // Team projects
@@ -116,6 +122,10 @@ export function getFilename(key: MDFileKey, config: ProjectConfig): string {
     DECISIONS_MD: 'DECISIONS.md',
     CONTEXT_MAP_MD: 'CONTEXT_MAP.md',
     ERROR_HANDLING_MD: 'ERROR_HANDLING.md',
+    LLMS_TXT: 'llms.txt',
+    COPILOT_INSTRUCTIONS_MD: '.github/copilot-instructions.md',
+    WINDSURF_RULES_MD: 'WINDSURF_RULES.md',
+    MCP_CONFIG_JSON: '.claude/mcp.json',
   };
   return map[key];
 }

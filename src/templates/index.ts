@@ -5,6 +5,7 @@ import CLAUDE_md from './core/CLAUDE_md';
 import ARCHITECTURE_md from './core/ARCHITECTURE_md';
 import PROGRESS_md from './core/PROGRESS_md';
 import README_md from './core/README_md';
+import LLMS_TXT_tmpl from './core/LLMS_TXT_tmpl';
 import SECURITY_md from './contextual/SECURITY_md';
 import DATABASE_SCHEMA_md from './contextual/DATABASE_SCHEMA_md';
 import API_SPEC_md from './contextual/API_SPEC_md';
@@ -15,7 +16,10 @@ import CURSOR_RULES_md from './contextual/CURSOR_RULES_md';
 import GITIGNORE_tmpl from './core/GITIGNORE_tmpl';
 import CURSORIGNORE_tmpl from './contextual/CURSORIGNORE_tmpl';
 import WINDSURFIGNORE_tmpl from './contextual/WINDSURFIGNORE_tmpl';
+import WINDSURF_RULES_md from './contextual/WINDSURF_RULES_md';
 import CLAUDE_SETTINGS_JSON_tmpl from './contextual/CLAUDE_SETTINGS_JSON_tmpl';
+import COPILOT_INSTRUCTIONS_md from './contextual/COPILOT_INSTRUCTIONS_md';
+import MCP_CONFIG_JSON_tmpl from './contextual/MCP_CONFIG_JSON_tmpl';
 import DEPLOYMENT_md from './contextual/DEPLOYMENT_md';
 import GIT_WORKFLOW_md from './contextual/GIT_WORKFLOW_md';
 import DESIGN_SYSTEM_md from './contextual/DESIGN_SYSTEM_md';
@@ -95,4 +99,8 @@ _Mark each item when done. Do not start the next slice before the current one is
   DECISIONS_MD: DECISIONS_md,
   CONTEXT_MAP_MD: CONTEXT_MAP_md,
   ERROR_HANDLING_MD: ERROR_HANDLING_md,
+  LLMS_TXT: LLMS_TXT_tmpl,
+  COPILOT_INSTRUCTIONS_MD: COPILOT_INSTRUCTIONS_md,
+  WINDSURF_RULES_MD: WINDSURF_RULES_md,
+  MCP_CONFIG_JSON: MCP_CONFIG_JSON_tmpl,
 };

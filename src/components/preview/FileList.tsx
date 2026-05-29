@@ -2,7 +2,7 @@ import type { GeneratedFile, MDFileKey } from '../../types';
 import { AlertTriangle, FileText, FileJson, GitBranchPlus } from 'lucide-react';
 
 const CORE_KEYS: Set<MDFileKey> = new Set([
-  'CLAUDE_MD', 'AGENTS_MD', 'README_MD', 'ARCHITECTURE_MD', 'PROGRESS_MD', 'GITIGNORE',
+  'CLAUDE_MD', 'AGENTS_MD', 'README_MD', 'ARCHITECTURE_MD', 'PROGRESS_MD', 'GITIGNORE', 'LLMS_TXT',
 ]);
 
 interface Props {

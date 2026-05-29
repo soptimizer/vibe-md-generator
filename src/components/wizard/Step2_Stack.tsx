@@ -102,10 +102,14 @@ export default function Step2_Stack() {
     if (config.backend  !== 'none' && stackIntent !== 'backend')  setStackIntent('backend');
   }, [config.frontend, config.backend]);
 
-  const handleChange = (key: keyof ProjectConfig) => (value: any) => {
+  const handleChange = (key: keyof ProjectConfig) => (value: string) => {
     const upd: Partial<ProjectConfig> = { [key]: value } as Partial<ProjectConfig>;
     if (key === 'backend' && value === 'none') { upd.databases = []; upd.queues = []; }
     updateConfig(upd);
+  };
+
+  const handleArrayChange = (key: 'databases' | 'queues') => (value: string[]) => {
+    updateConfig({ [key]: value } as Partial<ProjectConfig>);
   };
 
   return (
@@ -153,8 +157,8 @@ export default function Step2_Stack() {
           <SelectField label="Runtime" id="backend" value={config.backend} onChange={handleChange('backend')} options={allBackends} />
           {hasBackend && (
             <div className="grid gap-4">
-              <MultiField label="Databases" values={config.databases} onChange={handleChange('databases')} options={allDatabases} placeholder="None selected" />
-              <MultiField label="Queues / Brokers" values={config.queues} onChange={handleChange('queues')} options={allQueues} placeholder="None selected" />
+              <MultiField label="Databases" values={config.databases} onChange={handleArrayChange('databases')} options={allDatabases} placeholder="None selected" />
+              <MultiField label="Queues / Brokers" values={config.queues} onChange={handleArrayChange('queues')} options={allQueues} placeholder="None selected" />
             </div>
           )}
           {needsPkg && <SelectField label="Package manager" id="pkg-be" value={config.packageManager} onChange={handleChange('packageManager')} options={packageManagers} />}

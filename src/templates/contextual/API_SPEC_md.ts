@@ -1,11 +1,19 @@
 // src/templates/contextual/API_SPEC_md.ts
-import type { ProjectConfig } from '../../types';
+import type { ProjectConfig, Backend } from '../../types';
+
+function getDefaultPort(backend: Backend): number {
+  if (backend === 'python') return 8000;
+  if (backend === 'go' || backend === 'rust') return 8080;
+  if (backend === 'dotnet') return 5000;
+  return 3000;
+}
 
 export default function API_SPEC_md(config: ProjectConfig): string {
+  const port = getDefaultPort(config.backend);
   return `# API Spec — ${config.name}
 
 ## Base URL
-- Dev: \`http://localhost:3000/api\`
+- Dev: \`http://localhost:${port}/api\`
 - Prod: \`https://your-domain.com/api\`
 
 ## Auth

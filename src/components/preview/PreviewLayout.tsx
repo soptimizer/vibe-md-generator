@@ -90,7 +90,7 @@ export default function PreviewLayout({ files, projectName }: Props) {
 
         {/* Preview pane */}
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col rounded-xl border border-border/60 bg-card shadow-md shadow-black/20">
-          {activeFile && <MDPreview filename={activeFile.filename} content={activeFile.content} />}
+          {activeFile && <MDPreview filename={activeFile.filename} content={activeFile.content} warning={activeFile.warning} />}
         </div>
       </div>
     </div>

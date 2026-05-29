@@ -1,5 +1,6 @@
 // src/store/projectStore.ts
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { WizardStore, ProjectConfig } from '../types';
 import { generateFiles } from '../logic/generator';
 
@@ -23,20 +24,38 @@ const defaultConfig: ProjectConfig = {
   selectedSkills: [],
 };
 
-export const useProjectStore = create<WizardStore>((set, get) => ({
-  step: 1,
-  config: defaultConfig,
-  generatedFiles: [],
+export const useProjectStore = create<WizardStore>()(
+  persist(
+    (set, get) => ({
+      step: 1,
+      config: defaultConfig,
+      generatedFiles: [],
 
-  setStep: (step) => set({ step }),
+      setStep: (step) => set({ step }),
 
-  updateConfig: (partial) =>
-    set((state) => ({ config: { ...state.config, ...partial } })),
+      updateConfig: (partial) => {
+        set((state) => ({ config: { ...state.config, ...partial } }));
+        const updatedConfig = get().config;
+        if (updatedConfig.name.trim()) {
+          const files = generateFiles(updatedConfig);
+          set({ generatedFiles: files });
+        }
+      },
 
-  generateFiles: () => {
-    const files = generateFiles(get().config);
-    set({ generatedFiles: files });
-  },
+      generateFiles: () => {
+        const config = get().config;
+        if (!config.name.trim()) return;
+        const files = generateFiles(config);
+        set({ generatedFiles: files });
+      },
 
-  reset: () => set({ step: 1, config: defaultConfig, generatedFiles: [] }),
-}));
+      reset: () => {
+        set({ step: 1, config: defaultConfig, generatedFiles: [] });
+      },
+    }),
+    {
+      name: 'vibemd-wizard',
+      partialize: (state) => ({ step: state.step, config: state.config }),
+    },
+  ),
+);

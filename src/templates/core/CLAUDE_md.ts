@@ -2,6 +2,7 @@
 import type { ProjectConfig } from '../../types';
 import { getDevCmd, getBuildCmd, getTestCmd, getLintCmd, getDepsLabel } from '../../logic/commands';
 import { getBuildOutputDirs, getDependencyDirs } from '../../logic/ignorePatterns';
+import { hasSkill, hasAnySkill } from '../../logic/skillsHelper';
 
 function getBoundaries(config: ProjectConfig): string {
   const always: string[] = [
@@ -120,6 +121,55 @@ function getLayerSeparation(config: ProjectConfig): string {
   return lines.join('\n');
 }
 
+function getSkillRules(config: ProjectConfig): string {
+  const rules: string[] = [];
+
+  if (hasSkill(config, 'auth-system')) {
+    rules.push('- **Auth**: Never store tokens in localStorage — use httpOnly cookies or in-memory only');
+    rules.push('- **Auth**: Session invalidation must be server-side; client-side logout is not sufficient');
+  }
+  if (hasSkill(config, 'caching-system')) {
+    rules.push('- **Caching**: Cache invalidation must be explicit — never assume stale data is acceptable');
+    rules.push('- **Caching**: Cache keys must include all query parameters that affect the result');
+  }
+  if (hasSkill(config, 'logging-monitoring')) {
+    rules.push('- **Observability**: Never log PII, tokens, card numbers, or passwords');
+    rules.push('- **Observability**: All errors must be captured with context (request ID, user ID if available)');
+  }
+  if (hasSkill(config, 'docker') || hasAnySkill(config, ['kubernetes'])) {
+    rules.push('- **Containers**: Do not modify Dockerfile or docker-compose.yml without checking DEPLOYMENT.md first');
+    rules.push('- **Containers**: Environment variables injected at runtime — never baked into images');
+  }
+  if (hasSkill(config, 'accessibility')) {
+    rules.push('- **A11y**: Every interactive element must have a descriptive ARIA label or visible text');
+    rules.push('- **A11y**: Color contrast must meet WCAG AA (4.5:1 for normal text, 3:1 for large)');
+    rules.push('- **A11y**: All images need meaningful alt text; decorative images use alt=""');
+  }
+  if (hasSkill(config, 'testing')) {
+    rules.push('- **Testing**: Write tests before marking a task done; "works on my machine" is not acceptable');
+    rules.push('- **Testing**: Test behaviour, not implementation — avoid testing private methods directly');
+  }
+  if (hasSkill(config, 'code-review')) {
+    rules.push('- **Review**: PRs must link the issue they close and include a test plan in the description');
+    rules.push('- **Review**: Block merges with unresolved review comments; do not self-approve');
+  }
+  if (hasSkill(config, 'microservices-arch')) {
+    rules.push('- **Microservices**: Services must not share a database — communicate via API or message queue only');
+    rules.push('- **Microservices**: Each service owns its own schema migration; cross-service migrations are forbidden');
+  }
+  if (hasSkill(config, 'queue-system')) {
+    rules.push('- **Queues**: All queue consumers must be idempotent — messages may be delivered more than once');
+    rules.push('- **Queues**: Failed messages go to a dead-letter queue; never silently drop them');
+  }
+  if (hasAnySkill(config, ['rag-systems', 'machine-learning'])) {
+    rules.push('- **AI/ML**: Model outputs must be validated before being shown to users or stored');
+    rules.push('- **AI/ML**: Prompt templates must be versioned alongside code — treat them like source files');
+  }
+
+  if (rules.length === 0) return '';
+  return `## Skill-Specific Rules\n${rules.join('\n')}`;
+}
+
 function getReviewChecklist(config: ProjectConfig): string {
   const items: string[] = [
     '- [ ] No unused variables or dead code',
@@ -183,7 +233,7 @@ ${getLayerSeparation(config)}
 - Clear, descriptive variable and function names
 - No commented-out code — delete it
 - Check for similar patterns before creating utilities
-
+${getSkillRules(config) ? `\n${getSkillRules(config)}\n` : ''}
 ${getBoundaries(config)}
 
 ## Working Modes

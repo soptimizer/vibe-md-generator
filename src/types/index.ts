@@ -2,7 +2,7 @@
 
 export type ProjectType = 'webapp' | 'api' | 'service' | 'game' | 'cli' | 'library' | 'mobile';
 export type ProjectScale = 'solo' | 'small-team' | 'enterprise';
-export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'generic';
+export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot' | 'generic';
 export type Frontend = 'react' | 'vue' | 'nextjs' | 'svelte' | 'vanilla' | 'none';
 export type Backend = 'nodejs' | 'python' | 'go' | 'rust' | 'dotnet' | 'none';
 export type Database = 'postgresql' | 'mongodb' | 'sqlite' | 'mysql' | 'redis' | 'elastic' | 'bigquery' | 'clickhouse';
@@ -62,7 +62,11 @@ export type MDFileKey =
   | 'CONTRIBUTING_MD'
   | 'DECISIONS_MD'
   | 'CONTEXT_MAP_MD'
-  | 'ERROR_HANDLING_MD';
+  | 'ERROR_HANDLING_MD'
+  | 'LLMS_TXT'
+  | 'COPILOT_INSTRUCTIONS_MD'
+  | 'WINDSURF_RULES_MD'
+  | 'MCP_CONFIG_JSON';
 
 export interface GeneratedFile {
   key: MDFileKey;
