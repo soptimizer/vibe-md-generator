@@ -3,7 +3,8 @@ import { selectFiles } from './logic/fileSelector';
 import Step1_Basics from './components/wizard/Step1_Basics';
 import Step2_Stack from './components/wizard/Step2_Stack';
 import Step3_Goals from './components/wizard/Step3_Goals';
-import Step4_Review from './components/wizard/Step4_Review';
+import Step4_Skills from './components/wizard/Step4_Skills';
+import Step5_Review from './components/wizard/Step5_Review';
 import PreviewLayout from './components/preview/PreviewLayout';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -11,7 +12,8 @@ const STEPS = [
   { label: 'Basics',   num: 1 },
   { label: 'Stack',    num: 2 },
   { label: 'Features', num: 3 },
-  { label: 'Review',   num: 4 },
+  { label: 'Skills',   num: 4 },
+  { label: 'Review',   num: 5 },
 ];
 
 function CheckIcon() {
@@ -79,7 +81,8 @@ function WizardStep({ step }: { step: number }) {
   if (step === 1) return <Step1_Basics />;
   if (step === 2) return <Step2_Stack />;
   if (step === 3) return <Step3_Goals />;
-  return <Step4_Review />;
+  if (step === 4) return <Step4_Skills />;
+  return <Step5_Review />;
 }
 
 export default function App() {
@@ -166,7 +169,7 @@ export default function App() {
       {/* ── Main content ── */}
       <div className="flex-1 min-h-0 grid gap-0 lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr]">
         {/* Left — Wizard */}
-        <div className="flex flex-col h-full border-r border-border/40 overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <div className="flex flex-col h-full border-r border-border/40 overflow-hidden">
           <div className="p-3 sm:p-4">
             <ErrorBoundary>
               <div className="animate-scale-in">

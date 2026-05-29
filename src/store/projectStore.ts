@@ -20,6 +20,7 @@ const defaultConfig: ProjectConfig = {
   hasDeployment: false,
   tokenEfficiency: 'balanced',
   aiRole: 'assistant',
+  selectedSkills: [],
 };
 
 export const useProjectStore = create<WizardStore>((set, get) => ({

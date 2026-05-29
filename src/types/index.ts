@@ -32,6 +32,9 @@ export interface ProjectConfig {
   hasDeployment: boolean;
   tokenEfficiency: TokenEfficiency;
   aiRole: AIRole;
+
+  // Step 4
+  selectedSkills: string[];
 }
 
 export type MDFileKey =
