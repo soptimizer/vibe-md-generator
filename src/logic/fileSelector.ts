@@ -5,7 +5,10 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
   const files: MDFileKey[] = [];
 
   // Always required
-  files.push(config.aiTool === 'codex' ? 'AGENTS_MD' : 'CLAUDE_MD');
+  if (config.aiTool === 'codex') files.push('AGENTS_MD');
+  else if (config.aiTool === 'opencode') files.push('OPENCODE_AGENTS_MD');
+  else if (config.aiTool === 'antigravity') files.push('GEMINI_MD');
+  else files.push('CLAUDE_MD');
   files.push('PRD_MD');
   files.push('README_MD');
   files.push('ARCHITECTURE_MD');
@@ -28,6 +31,25 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
   }
   if (config.aiTool === 'copilot') {
     files.push('COPILOT_INSTRUCTIONS_MD');
+  }
+  if (config.aiTool === 'opencode') {
+    files.push('OPENCODE_JSON');
+    files.push('OPENCODE_SKILL_CONTEXT_MD');
+    files.push('OPENCODE_SKILL_REVIEW_MD');
+    if (config.hasTesting) files.push('OPENCODE_SKILL_TESTDRIVEN_MD');
+    if (config.frontend !== 'none') {
+      files.push('OPENCODE_AGENT_DESIGNER_MD');
+      files.push('OPENCODE_AGENT_FRONTEND_MD');
+    }
+    if (config.backend !== 'none') files.push('OPENCODE_AGENT_BACKEND_MD');
+    if (config.hasDeployment) files.push('OPENCODE_AGENT_DEVOPS_MD');
+  }
+  if (config.aiTool === 'antigravity') {
+    files.push('ANTIGRAVITY_AGENTS_MD');
+    files.push('ANTIGRAVITY_SKILL_REVIEW_MD');
+    files.push('ANTIGRAVITY_WORKFLOW_SETUP_MD');
+    if (config.hasTesting) files.push('ANTIGRAVITY_SKILL_TEST_MD');
+    if (config.hasDeployment) files.push('ANTIGRAVITY_WORKFLOW_DEPLOY_MD');
   }
 
   // Team projects
@@ -92,6 +114,16 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
     files.push('ERROR_HANDLING_MD');
   }
 
+  // Dependency audit for team projects or projects with deployment
+  if (config.hasDeployment || config.scale !== 'solo') {
+    files.push('DEPENDENCY_AUDIT_MD');
+  }
+
+  // Incident response for team projects with deployment
+  if (config.hasDeployment && config.scale !== 'solo') {
+    files.push('INCIDENT_RESPONSE_MD');
+  }
+
   return files;
 }
 
@@ -126,6 +158,23 @@ export function getFilename(key: MDFileKey, config: ProjectConfig): string {
     COPILOT_INSTRUCTIONS_MD: '.github/copilot-instructions.md',
     WINDSURF_RULES_MD: 'WINDSURF_RULES.md',
     MCP_CONFIG_JSON: '.claude/mcp.json',
+    OPENCODE_AGENTS_MD: 'AGENTS.md',
+    OPENCODE_JSON: 'opencode.json',
+    OPENCODE_AGENT_DESIGNER_MD: '.agent/agents/designer.md',
+    OPENCODE_AGENT_FRONTEND_MD: '.agent/agents/frontend-dev.md',
+    OPENCODE_AGENT_BACKEND_MD: '.agent/agents/backend-dev.md',
+    OPENCODE_AGENT_DEVOPS_MD: '.agent/agents/devops.md',
+    OPENCODE_SKILL_CONTEXT_MD: '.agent/skills/project-context-primer/SKILL.md',
+    OPENCODE_SKILL_REVIEW_MD: '.agent/skills/code-review/SKILL.md',
+    OPENCODE_SKILL_TESTDRIVEN_MD: '.agent/skills/test-driven-execution/SKILL.md',
+    DEPENDENCY_AUDIT_MD: 'DEPENDENCY_AUDIT.md',
+    INCIDENT_RESPONSE_MD: 'INCIDENT_RESPONSE.md',
+    GEMINI_MD: 'GEMINI.md',
+    ANTIGRAVITY_AGENTS_MD: 'AGENTS.md',
+    ANTIGRAVITY_SKILL_REVIEW_MD: '.agent/skills/review.md',
+    ANTIGRAVITY_SKILL_TEST_MD: '.agent/skills/test.md',
+    ANTIGRAVITY_WORKFLOW_SETUP_MD: '.agent/workflows/setup.md',
+    ANTIGRAVITY_WORKFLOW_DEPLOY_MD: '.agent/workflows/deploy.md',
   };
   return map[key];
 }

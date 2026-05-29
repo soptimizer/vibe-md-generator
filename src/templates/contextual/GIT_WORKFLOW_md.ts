@@ -90,6 +90,19 @@ ${getPRTemplate(config)}
 - Use **Merge Commit** for release branches (preserves context)
 - Delete the source branch after merging
 
+## Documentation Sync
+After merging any PR that changes behaviour, the author must update:
+
+| Changed | Update |
+|---------|--------|
+| New feature shipped | \`PROGRESS.md\` — mark done, move to Completed |
+| Architecture changed | \`ARCHITECTURE.md\` — update component tree / data flow |
+| New dependency added | \`TECH_STACK.md\` (if present) — add entry with reason |
+| API contract changed | \`API_SPEC.md\` (if present) — reflect new endpoints/schemas |
+| Known issue resolved | \`PROGRESS.md\` Known Issues — remove the entry |
+
+A PR that ships code without updating the relevant doc files is **not complete**.
+
 ---
 _Update this file when your team changes its process._
 `;

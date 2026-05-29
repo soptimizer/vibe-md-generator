@@ -2,7 +2,7 @@
 
 export type ProjectType = 'webapp' | 'api' | 'service' | 'game' | 'cli' | 'library' | 'mobile';
 export type ProjectScale = 'solo' | 'small-team' | 'enterprise';
-export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot' | 'generic';
+export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot' | 'opencode' | 'antigravity' | 'generic';
 export type Frontend = 'react' | 'vue' | 'nextjs' | 'svelte' | 'vanilla' | 'none';
 export type Backend = 'nodejs' | 'python' | 'go' | 'rust' | 'dotnet' | 'none';
 export type Database = 'postgresql' | 'mongodb' | 'sqlite' | 'mysql' | 'redis' | 'elastic' | 'bigquery' | 'clickhouse';
@@ -66,7 +66,24 @@ export type MDFileKey =
   | 'LLMS_TXT'
   | 'COPILOT_INSTRUCTIONS_MD'
   | 'WINDSURF_RULES_MD'
-  | 'MCP_CONFIG_JSON';
+  | 'MCP_CONFIG_JSON'
+  | 'OPENCODE_AGENTS_MD'
+  | 'OPENCODE_JSON'
+  | 'OPENCODE_AGENT_DESIGNER_MD'
+  | 'OPENCODE_AGENT_FRONTEND_MD'
+  | 'OPENCODE_AGENT_BACKEND_MD'
+  | 'OPENCODE_AGENT_DEVOPS_MD'
+  | 'OPENCODE_SKILL_CONTEXT_MD'
+  | 'OPENCODE_SKILL_REVIEW_MD'
+  | 'OPENCODE_SKILL_TESTDRIVEN_MD'
+  | 'DEPENDENCY_AUDIT_MD'
+  | 'INCIDENT_RESPONSE_MD'
+  | 'GEMINI_MD'
+  | 'ANTIGRAVITY_AGENTS_MD'
+  | 'ANTIGRAVITY_SKILL_REVIEW_MD'
+  | 'ANTIGRAVITY_SKILL_TEST_MD'
+  | 'ANTIGRAVITY_WORKFLOW_SETUP_MD'
+  | 'ANTIGRAVITY_WORKFLOW_DEPLOY_MD';
 
 export interface GeneratedFile {
   key: MDFileKey;

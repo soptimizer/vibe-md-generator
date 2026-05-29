@@ -9,13 +9,13 @@ import { AlertCircle } from 'lucide-react';
 
 const projectTypes: Array<ProjectConfig['type']> = ['webapp', 'api', 'service', 'game', 'cli', 'library', 'mobile'];
 const projectScales: Array<ProjectConfig['scale']> = ['solo', 'small-team', 'enterprise'];
-const aiTools: Array<ProjectConfig['aiTool']> = ['claude', 'cursor', 'windsurf', 'codex', 'copilot', 'generic'];
+const aiTools: Array<ProjectConfig['aiTool']> = ['claude', 'cursor', 'windsurf', 'codex', 'copilot', 'opencode', 'antigravity', 'generic'];
 
 const projectTypeIcons: Record<string, string> = {
   webapp: '🌐', api: '⚡', service: '⚙️', game: '🎮', cli: '💻', library: '📦', mobile: '📱',
 };
 const aiToolIcons: Record<string, string> = {
-  claude: 'C', cursor: 'Cs', windsurf: 'W', codex: 'Cx', copilot: 'Co', generic: 'G',
+  claude: 'C', cursor: 'Cs', windsurf: 'W', codex: 'Cx', copilot: 'Co', opencode: 'Oc', antigravity: 'Ag', generic: 'G',
 };
 
 function Field({
