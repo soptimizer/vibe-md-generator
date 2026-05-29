@@ -1,6 +1,6 @@
 # Progress
 
-## Status: Phase 5 — Skills Integration & 2025 AI Tools
+## Status: Phase 5 — COMPLETE ✅
 
 ## Completed
 
@@ -19,11 +19,11 @@
 - [x] Step 4 — Skills (85 skills across 10 categories with search + bulk select)
 - [x] Step 5 — Review (config summary + file list preview + generate trigger)
 - [x] Step indicator in App.tsx (visual progress bar)
-- [x] fileSelector.ts — rule-based file selection engine (25 file types)
+- [x] fileSelector.ts — rule-based file selection engine
 - [x] generator.ts — template runner with line-count warnings
-- [x] All 25 template files (5 core + 17 contextual + 2 inline + AGENTS_MD alias)
+- [x] 6 core templates (CLAUDE_md, ARCHITECTURE_md, PROGRESS_md, README_md, GITIGNORE, LLMS_TXT)
 - [x] exporter.ts — clipboard copy + ZIP download (JSZip)
-- [x] Preview panel in App.tsx — file tabs, content viewer, copy button, ZIP button
+- [x] Preview panel — file tabs, content viewer, copy button, ZIP button
 
 ### Phase 3 — Preview & Export
 - [x] MDPreview component with react-markdown rendering (+ Raw toggle)
@@ -38,30 +38,50 @@
 - [x] ErrorBoundary Turkish messages → English
 - [x] PROGRESS.md and ARCHITECTURE.md updated to reflect 5-step wizard
 
-## In Progress (Phase 5)
+### Phase 5 — Skills Integration & 2025 AI Tools
+- [x] `skillsHelper.ts` — `hasSkill()` / `hasAnySkill()` utility module
+- [x] CLAUDE_md.ts — `getSkillRules()` skill-specific rule injection (auth, caching, observability, containers, a11y, testing, code-review, microservices, queues, AI/ML)
+- [x] ARCHITECTURE_md.ts — `getSkillSections()` skill-specific architecture sections (containers, caching, microservices, RAG/ML, queues)
+- [x] `llms.txt` template (generated for all projects)
+- [x] GitHub Copilot Instructions (`.github/copilot-instructions.md`)
+- [x] Windsurf Rules (`WINDSURF_RULES.md`) + `.windsurfignore`
+- [x] MCP Config JSON (`.claude/mcp.json`)
+- [x] `'copilot'` added to AITool type + Step1 UI
+- [x] `'opencode'` support — OPENCODE_AGENTS_MD, OPENCODE_JSON, 3 skills, 4 agent personas
+- [x] `'antigravity'` support — GEMINI_MD, ANTIGRAVITY_AGENTS_MD, 2 skills, 2 workflows
+- [x] DEPENDENCY_AUDIT_MD — dependency review + upgrade plan template
+- [x] INCIDENT_RESPONSE_MD — severity levels, escalation path, postmortem template
+- [x] localStorage persistence via Zustand persist middleware (key: `vibemd-wizard`)
+- [x] Auto-generate on config change (triggered in `updateConfig()`)
+- [x] vitest test setup + fileSelector / commands tests
+- [x] TypeScript `any` eliminated across wizard components
+- [x] `generateFiles()` guard for empty `config.name`
+- [x] `commands.ts` — per-stack CLI helpers (install, dev, build, test, lint)
+- [x] `ignorePatterns.ts` — build output + dependency dir helpers
+- [x] Review checklist in CLAUDE_md.ts (framework-aware)
+- [x] Working modes (Build / Review / Refactor) in CLAUDE_md.ts
+- [x] Feature Registry table in CLAUDE_md.ts
 
-### Skills Integration
-- [ ] `skillsHelper.ts` utility module
-- [ ] CLAUDE_md.ts — `getSkillRules()` skill-specific rule injection
-- [ ] ARCHITECTURE_md.ts — `getSkillSections()` skill-specific architecture sections
+## In Progress (Phase 6)
 
-### 2025 AI Tool Support
-- [ ] `llms.txt` template (generated for all projects)
-- [ ] GitHub Copilot Instructions (`.github/copilot-instructions.md`)
-- [ ] Windsurf Rules (`WINDSURF_RULES.md`)
-- [ ] MCP Config JSON (`.claude/mcp.json`)
-- [ ] Add `'copilot'` to AITool type + Step1 UI
+### Content Quality
+- [ ] Skill suggestions auto-applied from stack (e.g. react → ui-builder, state-management)
+- [ ] Warning banner in MDPreview when file exceeds 150 lines
+- [ ] FileList badge showing warning count
 
-### UX Improvements
-- [ ] localStorage persistence (Zustand persist middleware)
-- [ ] Auto-generate on config change
-- [ ] Warning banner in MDPreview / FileList badge
-- [ ] Skill suggestions based on stack selection
+### New AI Tool Support
+- [ ] `'gemini'` as standalone AITool (currently Antigravity uses GEMINI_MD)
+- [ ] Codex / OpenAI Codex native support (currently reuses AGENTS_MD alias)
+
+### UX
+- [ ] Dark mode toggle
+- [ ] Copy-all-as-ZIP button in preview header
+- [ ] Shareable config link (lz-string compressed URL param)
 
 ### Quality
-- [ ] vitest test setup + fileSelector / commands / generator tests
-- [ ] TypeScript `any` fix in Step2_Stack.tsx
-- [ ] generateFiles() guard for empty config.name
+- [ ] generator.ts unit tests
+- [ ] Template snapshot tests (golden files)
+- [ ] Playwright e2e: full wizard → download ZIP → verify file names
 
 ## Known Issues
 _None_
@@ -70,6 +90,8 @@ _None_
 - Chose Zustand over Context API: simpler, no provider boilerplate
 - Chose JSZip over server-side: keeps app fully static
 - Templates as plain TS functions: testable, no DSL needed
-- AGENTS_MD reuses CLAUDE_md function, only filename differs
+- AGENTS_MD reuses CLAUDE_md function, only filename differs (same for OPENCODE_AGENTS_MD)
 - Inline lambdas for IMPLEMENTATION_PLAN_MD and TECH_STACK_MD (too small to warrant a file)
 - Skills inject into existing templates (CLAUDE.md, ARCHITECTURE.md) rather than creating separate files per skill
+- Antigravity uses GEMINI_MD as the primary AI context file (Gemini is the underlying model)
+- OpenCode uses `.agent/` folder structure for agents and skills (mirrors OpenCode spec)

@@ -23,7 +23,7 @@
 
 VibeMD Generator is a **client-side wizard** that produces a tailored set of Markdown context files for any project — ready to be dropped into your codebase and consumed by AI coding assistants like [Claude](https://claude.ai), [Cursor](https://cursor.sh), [Windsurf](https://codeium.com/windsurf), or [Codex](https://openai.com/index/openai-codex/).
 
-Instead of writing `CLAUDE.md`, `ARCHITECTURE.md`, `TASKS.md` and a dozen other context files by hand, you answer **4 short steps** in the wizard and download a ZIP. Done.
+Instead of writing `CLAUDE.md`, `ARCHITECTURE.md`, `TASKS.md` and a dozen other context files by hand, you answer **5 short steps** in the wizard and download a ZIP. Done.
 
 > **Zero backend. Zero accounts. Everything runs in your browser.**
 
@@ -31,7 +31,7 @@ Instead of writing `CLAUDE.md`, `ARCHITECTURE.md`, `TASKS.md` and a dozen other 
 
 ## ✨ Features
 
-- 🧙 **4-step guided wizard** — project basics, tech stack, features & goals, review
+- 🧙 **5-step guided wizard** — project basics, tech stack, features & goals, skills, review
 - 📄 **Smart file selection** — only generates the files your project actually needs
 - 👁️ **Live Markdown preview** — rendered + raw view with one-click copy
 - 📦 **ZIP export** — download everything in one click
@@ -43,24 +43,49 @@ Instead of writing `CLAUDE.md`, `ARCHITECTURE.md`, `TASKS.md` and a dozen other 
 
 ## 📁 Generated Files
 
-| File | Included when | Purpose |
-|------|--------------|---------|
-| `CLAUDE.md` / `AGENTS.md` | Always | AI onboarding context: role, stack, conventions |
-| `README.md` | Always | Project overview for humans and AI |
-| `ARCHITECTURE.md` | Always | Folder structure, data flow, design decisions |
-| `PROGRESS.md` | Always | Session continuity — what's done, what's next |
-| `PRD.md` | Always | Product requirements & scope |
-| `TASKS.md` | Team projects | Task tracking with priority |
-| `TECH_STACK.md` | Comprehensive mode | Detailed dependency rationale |
-| `DATABASE_SCHEMA.md` | Has a database | Schema reference for AI queries |
-| `SECURITY.md` | Auth or payments | Security rules & off-limits areas |
-| `API_SPEC.md` | API / service projects | Endpoint documentation |
-| `TESTING_STRATEGY.md` | Testing enabled | Test conventions & coverage targets |
-| `DEPLOYMENT.md` | Deployment enabled | Deploy steps & environment config |
-| `DESIGN_SYSTEM.md` | Frontend projects | Tokens, component conventions |
-| `ERROR_HANDLING.md` | Backend projects | Error patterns & logging strategy |
-| `.gitignore` | Always | Sensible defaults per stack |
-| `.claude/settings.json` | Claude AI tool | Claude project settings |
+**Always included**
+
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` | AI onboarding context: role, stack, conventions |
+| `README.md` | Project overview for humans and AI |
+| `ARCHITECTURE.md` | Folder structure, data flow, design decisions |
+| `PROGRESS.md` | Session continuity — what's done, what's next |
+| `PRD.md` | Product requirements & scope |
+| `llms.txt` | Plain-text project context for LLM tools |
+| `.gitignore` | Sensible defaults per stack |
+
+**AI tool-specific**
+
+| Tool | Files |
+|------|-------|
+| Claude | `.claude/settings.json`, `.claude/mcp.json` |
+| Cursor | `.cursor/rules/project.mdc`, `.cursorignore` |
+| Windsurf | `.windsurfignore`, `WINDSURF_RULES.md` |
+| Copilot | `.github/copilot-instructions.md` |
+| OpenCode | `opencode.json`, `.agent/agents/*.md`, `.agent/skills/*.md` |
+| Antigravity | `AGENTS.md`, `.agent/skills/*.md`, `.agent/workflows/*.md` |
+
+**Feature-conditional**
+
+| File | Included when |
+|------|--------------|
+| `TASKS.md` | Team / enterprise scale |
+| `TECH_STACK.md` | Comprehensive token mode |
+| `DATABASE_SCHEMA.md` | Has a database |
+| `SECURITY.md` | Auth or payments enabled |
+| `API_SPEC.md` | API / service / backend project |
+| `TESTING_STRATEGY.md` | Testing enabled |
+| `DEPLOYMENT.md` | Deployment enabled |
+| `DESIGN_SYSTEM.md` | Frontend project |
+| `ERROR_HANDLING.md` | Frontend or backend project |
+| `GIT_WORKFLOW.md` | Team / enterprise scale |
+| `CONTRIBUTING.md` | Team / enterprise scale |
+| `DECISIONS.md` | Comprehensive mode or team scale |
+| `CONTEXT_MAP.md` | Comprehensive token mode |
+| `IMPLEMENTATION_PLAN.md` | Comprehensive token mode |
+| `DEPENDENCY_AUDIT.md` | Deployment or team scale |
+| `INCIDENT_RESPONSE.md` | Deployment + team scale |
 
 ---
 
@@ -70,7 +95,7 @@ Instead of writing `CLAUDE.md`, `ARCHITECTURE.md`, `TASKS.md` and a dozen other 
 |---|---|
 | Name, type, scale, AI tool | Auth, payments, testing, AI role & token mode |
 
-| Step 4 — Review | Live Preview |
+| Step 5 — Review | Live Preview |
 |---|---|
 | Config summary + file manifest | Rendered Markdown with sidebar navigation |
 
@@ -111,12 +136,13 @@ npm run preview   # preview the production build locally
 ## 🗺️ How It Works
 
 ```
-User Input (4-step wizard)
+User Input (5-step wizard)
   └─▶ Zustand Store (ProjectConfig)
-        └─▶ fileSelector.ts      ← decides which .md files to include
-              └─▶ generator.ts   ← fills templates with your config values
-                    └─▶ MDPreview (renders output in the browser)
-                          └─▶ exporter.ts (ZIP download or clipboard copy)
+        └─▶ fileSelector.ts        ← decides which .md files to include
+              └─▶ templateRegistry ← 37 typed template functions
+                    └─▶ generator.ts ← assembles GeneratedFile[]
+                          └─▶ MDPreview (renders output in the browser)
+                                └─▶ exporter.ts (ZIP download or clipboard copy)
 ```
 
 All templates live in `src/templates/` and export a single pure function:
@@ -135,7 +161,7 @@ Adding a new template is as simple as writing that function and registering it i
 |-------|-----------|
 | Framework | React 18 + TypeScript 5.5 |
 | Build tool | Vite 5 |
-| Styling | Tailwind CSS 3 + shadcn/ui |
+| Styling | Tailwind CSS 4 + shadcn/ui |
 | UI primitives | Radix UI |
 | Icons | Lucide React |
 | State | Zustand |
@@ -151,21 +177,26 @@ Adding a new template is as simple as writing that function and registering it i
 vibemd-generator/
 ├── src/
 │   ├── components/
-│   │   ├── wizard/          # Step1_Basics, Step2_Stack, Step3_Goals, Step4_Review
-│   │   ├── preview/         # PreviewLayout, FileList, MDPreview
-│   │   └── ui/              # shadcn/ui components
+│   │   ├── wizard/           # Step1_Basics … Step5_Review
+│   │   ├── preview/          # PreviewLayout, FileList, MDPreview
+│   │   └── ui/               # shadcn/ui components
 │   ├── logic/
-│   │   ├── fileSelector.ts  # Rule engine — which files to generate
-│   │   ├── generator.ts     # Calls templates, assembles output
-│   │   ├── commands.ts      # CLI command label helpers
-│   │   └── exporter.ts      # ZIP + clipboard export
+│   │   ├── fileSelector.ts   # Rule engine — which files to generate
+│   │   ├── generator.ts      # Calls templateRegistry, assembles GeneratedFile[]
+│   │   ├── skillsHelper.ts   # hasSkill(), hasAnySkill()
+│   │   ├── commands.ts       # Per-stack CLI command strings
+│   │   ├── ignorePatterns.ts # Build output + dependency dir helpers
+│   │   └── exporter.ts       # ZIP + clipboard export
 │   ├── store/
-│   │   └── projectStore.ts  # Zustand store (ProjectConfig + wizard step)
+│   │   └── projectStore.ts   # Zustand store with localStorage persist
 │   ├── templates/
-│   │   ├── core/            # CLAUDE.md, README.md, ARCHITECTURE.md, …
-│   │   └── contextual/      # DATABASE_SCHEMA.md, SECURITY.md, API_SPEC.md, …
+│   │   ├── index.ts          # templateRegistry: Record<MDFileKey, fn>
+│   │   ├── core/             # 6 always-required templates
+│   │   └── contextual/       # 31 conditional templates
 │   ├── types/
-│   │   └── index.ts         # ProjectConfig, GeneratedFile, WizardStore
+│   │   └── index.ts          # ProjectConfig, MDFileKey, GeneratedFile, WizardStore
+│   ├── lib/
+│   │   └── utils.ts          # cn() Tailwind merge utility
 │   ├── App.tsx
 │   └── main.tsx
 ├── index.html
@@ -187,11 +218,11 @@ Contributions are welcome! Here's how to get started:
 
 ### Adding a New Template
 
-1. Create `src/templates/contextual/MY_TEMPLATE_md.ts`
-2. Export a default function `(config: ProjectConfig) => string`
-3. Add the key to `MDFileKey` in `src/types/index.ts`
-4. Register the selection rule in `src/logic/fileSelector.ts`
-5. Wire it up in `src/logic/generator.ts`
+1. Add the key to `MDFileKey` in `src/types/index.ts`
+2. Create `src/templates/contextual/MY_TEMPLATE_md.ts` and export a default function `(config: ProjectConfig) => string`
+3. Register it in `src/templates/index.ts` (import + add to `templateRegistry`)
+4. Add `getFilename()` mapping in `src/logic/fileSelector.ts`
+5. Add the selection rule in `selectFiles()` in `src/logic/fileSelector.ts`
 
 ---
 
