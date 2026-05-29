@@ -170,6 +170,66 @@ function getSkillRules(config: ProjectConfig): string {
   return `## Skill-Specific Rules\n${rules.join('\n')}`;
 }
 
+function getNeverDoRules(config: ProjectConfig): string {
+  const rules: string[] = [
+    '- Never commit secrets, API keys, or .env files',
+    '- Never leave TODO comments — open an issue instead',
+    '- Never silently swallow errors (`catch {}` or `catch (e) {}` with no handling)',
+  ];
+
+  if (config.frontend === 'react' || config.frontend === 'nextjs') {
+    rules.push('- Never use inline styles when a Tailwind class exists');
+    rules.push('- Never recreate a UI component that shadcn/ui already provides');
+    rules.push('- Never call setState inside a render — use useEffect or derived state');
+    rules.push('- Never use array index as a React key for lists that change order');
+  }
+  if (config.frontend === 'vue') {
+    rules.push('- Never mutate Pinia state directly outside a store action');
+    rules.push('- Never mix Options API and Composition API in the same component');
+  }
+  if (config.frontend === 'svelte') {
+    rules.push('- Never mutate a prop — use events or writable stores to propagate changes upward');
+  }
+
+  if (config.backend === 'nodejs') {
+    rules.push('- Never use `require()` in an ES module project (use `import`)');
+    rules.push('- Never block the event loop with synchronous fs/crypto operations in hot paths');
+    rules.push('- Never return raw database errors to the client — sanitize first');
+  }
+  if (config.backend === 'python') {
+    rules.push('- Never use mutable default arguments (`def f(x=[])`) — use `None` sentinel instead');
+    rules.push('- Never catch bare `except:` — always name the exception type');
+    rules.push('- Never use `print()` for logging — use the `logging` module');
+  }
+  if (config.backend === 'go') {
+    rules.push('- Never ignore a returned error — always check it explicitly');
+    rules.push('- Never use `panic()` for expected error conditions — return errors');
+  }
+  if (config.backend === 'rust') {
+    rules.push('- Never use `.unwrap()` in production code — use `?` or explicit error handling');
+    rules.push('- Never use `clone()` to satisfy the borrow checker without considering the cost');
+  }
+
+  if (config.hasTesting) {
+    rules.push('- Never delete or skip tests to make the suite pass — fix the underlying issue');
+    rules.push('- Never mock the database in integration tests — test against real data stores');
+  }
+  if (config.databases.length > 0) {
+    rules.push('- Never run raw string-interpolated SQL — always use parameterized queries');
+    rules.push('- Never run schema migrations without a rollback plan');
+  }
+  if (config.hasAuth) {
+    rules.push('- Never store passwords in plaintext — always hash with bcrypt/argon2');
+    rules.push('- Never roll your own crypto — use established libraries');
+  }
+  if (config.scale !== 'solo') {
+    rules.push('- Never push directly to main/master — always open a PR');
+    rules.push('- Never self-approve a PR you authored');
+  }
+
+  return `## Never Do\n${rules.join('\n')}`;
+}
+
 function getReviewChecklist(config: ProjectConfig): string {
   const items: string[] = [
     '- [ ] No unused variables or dead code',
@@ -235,6 +295,8 @@ ${getLayerSeparation(config)}
 - Check for similar patterns before creating utilities
 ${getSkillRules(config) ? `\n${getSkillRules(config)}\n` : ''}
 ${getBoundaries(config)}
+
+${getNeverDoRules(config)}
 
 ## Working Modes
 

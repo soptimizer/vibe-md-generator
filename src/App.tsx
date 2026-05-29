@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useProjectStore } from './store/projectStore';
 import { selectFiles } from './logic/fileSelector';
+import { encodeConfigToUrl, decodeConfigFromUrl } from './logic/exporter';
 import Step1_Basics from './components/wizard/Step1_Basics';
 import Step2_Stack from './components/wizard/Step2_Stack';
 import Step3_Goals from './components/wizard/Step3_Goals';
@@ -85,14 +87,71 @@ function WizardStep({ step }: { step: number }) {
   return <Step5_Review />;
 }
 
+function MoonIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  );
+}
+
 export default function App() {
-  const { step, setStep, generatedFiles, config, reset } = useProjectStore();
+  const { step, setStep, generatedFiles, config, reset, theme, toggleTheme, updateConfig } = useProjectStore();
+  const [linkCopied, setLinkCopied] = useState(false);
   const selectedKeys = selectFiles(config);
+
+  // Load config from shared URL on first mount
+  useEffect(() => {
+    const shared = decodeConfigFromUrl();
+    if (shared) {
+      updateConfig(shared);
+      // Clear the URL param after loading
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const stackLabel = config.frontend !== 'none'
     ? config.frontend
     : config.backend !== 'none'
     ? config.backend
     : null;
+
+  const handleCopyLink = async () => {
+    if (!config.name.trim()) return;
+    const url = encodeConfigToUrl(config);
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable — silently ignore
+    }
+  };
 
   return (
     <div className="h-screen w-full bg-background text-foreground flex flex-col overflow-hidden">
@@ -123,6 +182,32 @@ export default function App() {
 
         {/* Divider */}
         <div className="h-6 w-px bg-border/60 shrink-0 hidden sm:block" />
+
+        {/* Share link button */}
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          disabled={!config.name.trim()}
+          title={config.name.trim() ? 'Copy shareable config link' : 'Enter a project name first'}
+          className={`shrink-0 flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-xs font-medium transition-colors duration-150 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
+            linkCopied
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border/60 bg-card text-muted-foreground hover:text-foreground hover:border-primary/40'
+          }`}
+        >
+          <LinkIcon />
+          <span className="hidden sm:inline">{linkCopied ? 'Copied!' : 'Share'}</span>
+        </button>
+
+        {/* Dark / Light toggle */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="shrink-0 flex items-center justify-center h-8 w-8 rounded-lg border border-border/60 bg-card text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors duration-150 cursor-pointer"
+        >
+          {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </button>
 
         {/* Reset */}
         <button

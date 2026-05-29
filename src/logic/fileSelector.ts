@@ -4,10 +4,10 @@ import type { ProjectConfig, MDFileKey } from '../types';
 export function selectFiles(config: ProjectConfig): MDFileKey[] {
   const files: MDFileKey[] = [];
 
-  // Always required
+  // Always required — primary AI context file varies by tool
   if (config.aiTool === 'codex') files.push('AGENTS_MD');
   else if (config.aiTool === 'opencode') files.push('OPENCODE_AGENTS_MD');
-  else if (config.aiTool === 'antigravity') files.push('GEMINI_MD');
+  else if (config.aiTool === 'antigravity' || config.aiTool === 'gemini') files.push('GEMINI_MD');
   else files.push('CLAUDE_MD');
   files.push('PRD_MD');
   files.push('README_MD');
@@ -31,6 +31,10 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
   }
   if (config.aiTool === 'copilot') {
     files.push('COPILOT_INSTRUCTIONS_MD');
+  }
+  if (config.aiTool === 'aider') {
+    files.push('AIDER_CONF');
+    files.push('AIDER_CONVENTIONS_MD');
   }
   if (config.aiTool === 'opencode') {
     files.push('OPENCODE_JSON');
@@ -124,10 +128,20 @@ export function selectFiles(config: ProjectConfig): MDFileKey[] {
     files.push('INCIDENT_RESPONSE_MD');
   }
 
+  // Docker Compose when deployment is enabled or docker skill is selected
+  if (config.hasDeployment || config.selectedSkills.includes('docker')) {
+    files.push('DOCKER_COMPOSE_YML');
+  }
+
+  // GitHub Actions CI when deployment is enabled
+  if (config.hasDeployment) {
+    files.push('GITHUB_ACTIONS_CI_YML');
+  }
+
   return files;
 }
 
-export function getFilename(key: MDFileKey, config: ProjectConfig): string {
+export function getFilename(key: MDFileKey, _config: ProjectConfig): string {
   const map: Record<MDFileKey, string> = {
     CLAUDE_MD: 'CLAUDE.md',
     AGENTS_MD: 'AGENTS.md',
@@ -175,6 +189,10 @@ export function getFilename(key: MDFileKey, config: ProjectConfig): string {
     ANTIGRAVITY_SKILL_TEST_MD: '.agent/skills/test.md',
     ANTIGRAVITY_WORKFLOW_SETUP_MD: '.agent/workflows/setup.md',
     ANTIGRAVITY_WORKFLOW_DEPLOY_MD: '.agent/workflows/deploy.md',
+    AIDER_CONF: '.aider.conf.yml',
+    AIDER_CONVENTIONS_MD: 'AIDER_CONVENTIONS.md',
+    DOCKER_COMPOSE_YML: 'docker-compose.yml',
+    GITHUB_ACTIONS_CI_YML: '.github/workflows/ci.yml',
   };
   return map[key];
 }

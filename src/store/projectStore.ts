@@ -28,10 +28,21 @@ export const useProjectStore = create<WizardStore>()(
   persist(
     (set, get) => ({
       step: 1,
+      theme: 'dark',
       config: defaultConfig,
       generatedFiles: [],
 
       setStep: (step) => set({ step }),
+
+      toggleTheme: () => {
+        const next = get().theme === 'dark' ? 'light' : 'dark';
+        set({ theme: next });
+        if (next === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      },
 
       updateConfig: (partial) => {
         set((state) => ({ config: { ...state.config, ...partial } }));
@@ -55,7 +66,17 @@ export const useProjectStore = create<WizardStore>()(
     }),
     {
       name: 'vibemd-wizard',
-      partialize: (state) => ({ step: state.step, config: state.config }),
+      partialize: (state) => ({ step: state.step, theme: state.theme, config: state.config }),
+      onRehydrateStorage: () => (state) => {
+        // Sync the theme class on hydration
+        if (state) {
+          if (state.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      },
     },
   ),
 );

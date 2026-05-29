@@ -52,6 +52,9 @@ import {
   ANTIGRAVITY_WORKFLOW_SETUP_md,
   ANTIGRAVITY_WORKFLOW_DEPLOY_md,
 } from './contextual/ANTIGRAVITY_WORKFLOWS';
+import { AIDER_CONF_tmpl, AIDER_CONVENTIONS_md } from './contextual/AIDER_tmpl';
+import DOCKER_COMPOSE_tmpl from './contextual/DOCKER_COMPOSE_tmpl';
+import GITHUB_ACTIONS_CI_tmpl from './contextual/GITHUB_ACTIONS_CI_tmpl';
 
 // AGENTS.md is same as CLAUDE.md but with different filename
 const AGENTS_md = CLAUDE_md;
@@ -145,4 +148,8 @@ _Mark each item when done. Do not start the next slice before the current one is
   ANTIGRAVITY_SKILL_TEST_MD: ANTIGRAVITY_SKILL_TEST_md,
   ANTIGRAVITY_WORKFLOW_SETUP_MD: ANTIGRAVITY_WORKFLOW_SETUP_md,
   ANTIGRAVITY_WORKFLOW_DEPLOY_MD: ANTIGRAVITY_WORKFLOW_DEPLOY_md,
+  AIDER_CONF: AIDER_CONF_tmpl,
+  AIDER_CONVENTIONS_MD: AIDER_CONVENTIONS_md,
+  DOCKER_COMPOSE_YML: DOCKER_COMPOSE_tmpl,
+  GITHUB_ACTIONS_CI_YML: GITHUB_ACTIONS_CI_tmpl,
 };

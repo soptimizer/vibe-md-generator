@@ -2,7 +2,7 @@
 
 export type ProjectType = 'webapp' | 'api' | 'service' | 'game' | 'cli' | 'library' | 'mobile';
 export type ProjectScale = 'solo' | 'small-team' | 'enterprise';
-export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot' | 'opencode' | 'antigravity' | 'generic';
+export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot' | 'opencode' | 'antigravity' | 'gemini' | 'aider' | 'generic';
 export type Frontend = 'react' | 'vue' | 'nextjs' | 'svelte' | 'vanilla' | 'none';
 export type Backend = 'nodejs' | 'python' | 'go' | 'rust' | 'dotnet' | 'none';
 export type Database = 'postgresql' | 'mongodb' | 'sqlite' | 'mysql' | 'redis' | 'elastic' | 'bigquery' | 'clickhouse';
@@ -83,7 +83,11 @@ export type MDFileKey =
   | 'ANTIGRAVITY_SKILL_REVIEW_MD'
   | 'ANTIGRAVITY_SKILL_TEST_MD'
   | 'ANTIGRAVITY_WORKFLOW_SETUP_MD'
-  | 'ANTIGRAVITY_WORKFLOW_DEPLOY_MD';
+  | 'ANTIGRAVITY_WORKFLOW_DEPLOY_MD'
+  | 'AIDER_CONF'
+  | 'AIDER_CONVENTIONS_MD'
+  | 'DOCKER_COMPOSE_YML'
+  | 'GITHUB_ACTIONS_CI_YML';
 
 export interface GeneratedFile {
   key: MDFileKey;
@@ -94,9 +98,11 @@ export interface GeneratedFile {
 
 export interface WizardStore {
   step: number;
+  theme: 'dark' | 'light';
   config: ProjectConfig;
   generatedFiles: GeneratedFile[];
   setStep: (step: number) => void;
+  toggleTheme: () => void;
   updateConfig: (partial: Partial<ProjectConfig>) => void;
   generateFiles: () => void;
   reset: () => void;

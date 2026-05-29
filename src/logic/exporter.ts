@@ -1,5 +1,6 @@
 // src/logic/exporter.ts
-import type { GeneratedFile } from '../types';
+import type { GeneratedFile, ProjectConfig } from '../types';
+import LZString from 'lz-string';
 
 export async function copyToClipboard(content: string): Promise<boolean> {
   try {
@@ -26,4 +27,22 @@ export async function downloadZip(files: GeneratedFile[], projectName: string): 
   a.download = `${projectName.toLowerCase().replace(/\s+/g, '-')}-md-files.zip`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+export function encodeConfigToUrl(config: ProjectConfig): string {
+  const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(config));
+  return `${window.location.origin}${window.location.pathname}?c=${compressed}`;
+}
+
+export function decodeConfigFromUrl(): ProjectConfig | null {
+  const params = new URLSearchParams(window.location.search);
+  const c = params.get('c');
+  if (!c) return null;
+  try {
+    const json = LZString.decompressFromEncodedURIComponent(c);
+    if (!json) return null;
+    return JSON.parse(json) as ProjectConfig;
+  } catch {
+    return null;
+  }
 }

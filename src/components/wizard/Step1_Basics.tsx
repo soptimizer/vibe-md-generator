@@ -9,7 +9,7 @@ import { AlertCircle } from 'lucide-react';
 
 const projectTypes: Array<ProjectConfig['type']> = ['webapp', 'api', 'service', 'game', 'cli', 'library', 'mobile'];
 const projectScales: Array<ProjectConfig['scale']> = ['solo', 'small-team', 'enterprise'];
-const aiTools: Array<ProjectConfig['aiTool']> = ['claude', 'cursor', 'windsurf', 'codex', 'copilot', 'opencode', 'antigravity', 'generic'];
+const aiTools: Array<ProjectConfig['aiTool']> = ['claude', 'cursor', 'windsurf', 'codex', 'copilot', 'opencode', 'gemini', 'aider', 'antigravity', 'generic'];
 
 const projectTypeIcons: Record<string, string> = {
   webapp: '🌐', api: '⚡', service: '⚙️', game: '🎮', cli: '💻', library: '📦', mobile: '📱',
